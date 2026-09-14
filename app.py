@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from anthropic import Anthropic
 from database import SessionLocal, engine, Base
 from models import User, Conversation, Message
+from neuro_models import Studies, Coordinate, Concept, Study_concept
 import os
 
 load_dotenv()
