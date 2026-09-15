@@ -6,6 +6,7 @@ from anthropic import Anthropic
 from database import SessionLocal, engine, Base
 from models import User, Conversation, Message
 from neuro_models import Studies, Coordinate, Concept, Study_concept
+from neuro_queries import get_regions_for_concept
 import os
 
 load_dotenv()
@@ -13,6 +14,22 @@ load_dotenv()
 app = FastAPI()
 Base.metadata.create_all(bind=engine)
 client = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+
+concept_extraction_tool = {
+    "name": "extract_concepts",
+    "description":"Extract cognitive/psychological/emotional concepts mentioned or implied in the user's message that relate to brain function.",
+    "input_schema": {
+        "type":"object",
+        "properties": {
+            "concepts": {
+                "type":"array",
+                "items": {"type":"string"},
+                "description":"List of concept names, e.g. ['fear', 'memory']. Empty list if no relevant concepts."
+            }
+        },
+        "required":["concepts"]
+    }
+}
 
 class ChatRequest(BaseModel):
     message: str
@@ -48,14 +65,27 @@ def chat(request: ChatRequest):
     response = client.messages.create(
         model="claude-sonnet-5",
         max_tokens=1000,
-        messages = messages_history
+        messages = messages_history,
+        tools = [concept_extraction_tool]
     )
+    reply_text = None
+    concept_list = None
+    coordinates=[]
     for block in response.content:
         if block.type == "text":
-           assistant_message =  Message(conversation_id=request.conversation_id, role = "assistant", content = block.text)
-           db.add(assistant_message)
-           db.commit()
-           return {"reply": block.text}
+           reply_text = block.text
+        if block.type == "tool_use":
+            concept_list = block.input["concepts"]
+            for concept_name in concept_list:
+                coordinates.extend(get_regions_for_concept(concept_name, db)["coordinates"])
+    if reply_text == None:
+        reply_text = "Coordinates and concepts found to specific scenario."
+
+    assistant_message =  Message(conversation_id=request.conversation_id, role = "assistant", content = reply_text)
+    db.add(assistant_message)
+    db.commit()
+    
+    return {"reply": reply_text, "coordinates": coordinates, "detected_concepts":concept_list}
 
 
 @app.post("/new-conversation")
