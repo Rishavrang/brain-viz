@@ -7,6 +7,7 @@ from database import SessionLocal, engine, Base
 from models import User, Conversation, Message
 from neuro_models import Studies, Coordinate, Concept, Study_concept
 from neuro_queries import get_regions_for_concept
+from prompt import explanation_system_prompt
 import os
 
 load_dotenv()
@@ -71,6 +72,7 @@ def chat(request: ChatRequest):
     reply_text = None
     concept_list = None
     coordinates=[]
+    top_studies=[]
     for block in response.content:
         if block.type == "text":
            reply_text = block.text
@@ -78,8 +80,36 @@ def chat(request: ChatRequest):
             concept_list = block.input["concepts"]
             for concept_name in concept_list:
                 coordinates.extend(get_regions_for_concept(concept_name, db)["coordinates"])
-    if reply_text == None:
-        reply_text = "Coordinates and concepts found to specific scenario."
+                top_studies.extend(get_regions_for_concept(concept_name, db)["top_studies"])
+
+    if reply_text==None:
+            reply_text=""
+
+    if concept_list != None:
+        second_message_history=""
+        for concept in concept_list:
+            second_message_history+=(f'The concepts are {concept}')
+        for study in top_studies:
+            second_message_history+=(f'Study:{study["name"]} by {study["author"]} published in {study["publication"]}, evidence {study["weight"]}')
+
+        second_conversation = [{"role":"user", "content":second_message_history}]
+
+        response = client.messages.create(
+                model="claude-sonnet-5",
+                max_tokens=1500,
+                system = explanation_system_prompt,
+                messages = second_conversation
+            )
+        for block in response.content:
+                if block.type == "text":
+                   reply2_text = block.text
+        if reply_text != "":
+             reply_text += " " + reply2_text
+        else:
+             reply_text += reply2_text
+
+    if reply_text=="":
+            reply_text="Second reply did not trigger.."
 
     assistant_message =  Message(conversation_id=request.conversation_id, role = "assistant", content = reply_text)
     db.add(assistant_message)
