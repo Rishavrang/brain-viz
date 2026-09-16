@@ -13,11 +13,12 @@ files = fetch_neurosynth(
 
 studyset = files[0]
 coords_df = studyset.coordinates
+studies_list = studyset.studies
 
 db = SessionLocal()
 
 unique_study_ids =  coords_df["study_id"].unique()
-study_records = [{"id": str(sid), "Name":None, "Author":None,"publish_date":None} for sid in unique_study_ids]
+study_records = [{"id": study.id, "name":study.name, "author":study.authors,"publication":study.publication, "publish_date":study.year} for study in studies_list]
 db.bulk_insert_mappings(Studies, study_records)
 db.commit()
 print(f"Inserted {len(study_records)} studies")

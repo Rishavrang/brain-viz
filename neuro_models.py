@@ -6,9 +6,10 @@ class Studies(Base):
     __tablename__ = "studies"
 
     id = Column(String, primary_key=True)
-    name = Column(String(255))
-    author = Column(String(255))
-    publish_date = Column(String)
+    name = Column(Text)
+    author = Column(Text)
+    publish_date = Column(Text)
+    publication = Column(Text)
 
 class Coordinate(Base):
     __tablename__ = "coordinates"
