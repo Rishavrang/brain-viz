@@ -112,6 +112,8 @@ def chat(request: ChatRequest):
             second_message_history+=(f'The concepts are {concept}')
         for study in top_studies:
             second_message_history+=(f'Study:{study["name"]} by {study["author"]} published in {study["publication"]}, evidence {study["weight"]}')
+        for coordinate in coordinates:
+            second_message_history+=(f'The coordinate point number is {coordinate["point_number"]} and confidence is {coordinate["confidence"]}')
 
         second_conversation = [{"role":"user", "content":second_message_history}]
 

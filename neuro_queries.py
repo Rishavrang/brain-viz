@@ -11,6 +11,7 @@ def get_regions_for_concept(concept_name, db):
     coordinate_row =  db.query(Coordinate).filter(Coordinate.study_id.in_(study_ids)).all()
     studies = db.query(Studies).filter(Studies.id.in_(study_ids)).all()
     studyid_to_weight = {c.study_id:c.weight for c in study_concepts}
+    studyid_to_name_and_author = {c.id:{"name":c.name, "author":c.author}for c in studies}
 
     coords ={}
     for c in coordinate_row:
@@ -36,7 +37,7 @@ def get_regions_for_concept(concept_name, db):
 
     
 
-    coordinates = [{"x":c.x, "y":c.y, "z":c.z, "weight":studyid_to_weight[c.study_id]} for c in final_coords]
+    coordinates = [{"x":c.x, "y":c.y, "z":c.z, "weight":studyid_to_weight[c.study_id], "study_name":studyid_to_name_and_author[c.study_id]["name"], "study_author":studyid_to_name_and_author[c.study_id]["author"]} for c in final_coords]
     concepts =  [{"weight":c.weight, "study_id":c.study_id} for c in study_concepts]
     for y in concepts:
         for z in studies:
