@@ -87,8 +87,21 @@ def chat(request: ChatRequest):
         if block.type == "tool_use":
             concept_list = block.input["concepts"]
             for concept_name in concept_list:
-                coordinates.extend(get_regions_for_concept(concept_name, db)["coordinates"])
-                top_studies.extend(get_regions_for_concept(concept_name, db)["top_studies"])
+                current_region = get_regions_for_concept(concept_name, db)
+                current_coords = current_region["coordinates"]
+                for index,c in enumerate(current_coords):
+                    c["point_number"]= len(coordinates)+1+index
+                    if c["weight"]>0.80:
+                         c["confidence"]="High"
+                    elif c["weight"]>0.50:
+                         c["confidence"]="Medium"
+                    elif c["weight"]>0.05:
+                         c["confidence"]="Low"
+                    else: 
+                         c["confidence"]="None"
+
+                coordinates.extend(current_coords)
+                top_studies.extend(current_region["top_studies"])
 
     if reply_text==None:
             reply_text=""
