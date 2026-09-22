@@ -33,7 +33,7 @@ concept_extraction_tool = {
             "concepts": {
                 "type":"array",
                 "items": {"type":"string"},
-                "description":"List of concept names, e.g. ['fear', 'memory']. Empty list if no relevant concepts."
+                "description":"List of the most relevant and central neuroscience concept names for the user's scenario. Return at most 3 concepts, prioritizing the concepts that are most directly supported by the scenario and most important for explaining it. If more than 3 concepts could apply, select only the 3 strongest and most relevant rather than listing every possible concept. Avoid redundant or overly broad concepts. Return an empty list if no relevant concepts are identified."
             }
         },
         "required":["concepts"]
@@ -86,6 +86,7 @@ def chat(request: ChatRequest):
            reply_text = block.text
         if block.type == "tool_use":
             concept_list = block.input["concepts"]
+            concept_list = concept_list[:3]
             for concept_name in concept_list:
                 current_region = get_regions_for_concept(concept_name, db)
                 current_coords = current_region["coordinates"]
@@ -110,19 +111,18 @@ def chat(request: ChatRequest):
         second_message_history=""
         for concept in concept_list:
             second_message_history+=(f'The concepts are {concept}')
-        for study in top_studies:
-            second_message_history+=(f'Study:{study["name"]} by {study["author"]} published in {study["publication"]}, evidence {study["weight"]}')
         for coordinate in coordinates:
-            second_message_history+=(f'The coordinate point number is {coordinate["point_number"]} and confidence is {coordinate["confidence"]}')
+            second_message_history+=(f'The coordinate point number is {coordinate["point_number"]} with coordinates {coordinate["x"]} {coordinate["y"]} {coordinate["z"]} and confidence is {coordinate["confidence"]} related to the study {coordinate["study_name"]} by {coordinate["study_author"]}')
 
         second_conversation = [{"role":"user", "content":second_message_history}]
 
         response = client.messages.create(
                 model="claude-sonnet-5",
-                max_tokens=1500,
+                max_tokens=4000,
                 system = explanation_system_prompt,
                 messages = second_conversation
             )
+        
         for block in response.content:
                 if block.type == "text":
                    reply2_text = block.text
