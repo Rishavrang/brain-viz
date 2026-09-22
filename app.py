@@ -33,7 +33,7 @@ concept_extraction_tool = {
             "concepts": {
                 "type":"array",
                 "items": {"type":"string"},
-                "description":"List of the most relevant and central neuroscience concept names for the user's scenario. Return at most 3 concepts, prioritizing the concepts that are most directly supported by the scenario and most important for explaining it. If more than 3 concepts could apply, select only the 3 strongest and most relevant rather than listing every possible concept. Avoid redundant or overly broad concepts. Return an empty list if no relevant concepts are identified."
+                "description":"List of up to 3 concept names representing the scenario, using standard, single-word or short well-established neuroscience/psychology terms — the kind that appear in real cognitive neuroscience research abstracts, e.g. 'fear', 'anxiety', 'memory', 'navigation', 'attention', 'reward', 'stress', 'emotion', 'language', 'decision-making'. These terms are matched against a fixed scientific vocabulary, so prefer the single most standard, general term for an idea rather than a descriptive phrase or compound label. For example, use 'fear' instead of 'fear of snakes' or 'evolutionary preparedness toward snakes'; use 'threat' instead of 'threat detection system'. If you're unsure whether a precise term exists, choose the closest common, general term rather than a more specific or compound one — a slightly broader match is better than no match. Return up to 3 concepts, prioritizing the most central and relevant concepts, and do not add concepts simply to reach 3. Return an empty list only if truly no relevant concept applies."
             }
         },
         "required":["concepts"]
@@ -75,34 +75,75 @@ def chat(request: ChatRequest):
         model="claude-sonnet-5",
         max_tokens=1000,
         messages = messages_history,
+        system="You are a helpful assistant. When extracting concepts, prefer simple, standard, single-word or short well-established neuroscience/psychology terms over descriptive phrases, since they must match a fixed scientific vocabulary.",
         tools = [concept_extraction_tool]
     )
     reply_text = None
     concept_list = None
-    coordinates=[]
-    top_studies=[]
+    top_studies =[]
+    CONFIDENCE_THRESHOLD = 0.30
+    MAX_TOTAL_POINTS = 10
+
     for block in response.content:
         if block.type == "text":
-           reply_text = block.text
+            reply_text = block.text
         if block.type == "tool_use":
             concept_list = block.input["concepts"]
             concept_list = concept_list[:3]
+
+            # Stage 1: gather all candidate coordinates, grouped by concept
+            coords_by_concept = {}
             for concept_name in concept_list:
                 current_region = get_regions_for_concept(concept_name, db)
-                current_coords = current_region["coordinates"]
-                for index,c in enumerate(current_coords):
-                    c["point_number"]= len(coordinates)+1+index
-                    if c["weight"]>0.80:
-                         c["confidence"]="High"
-                    elif c["weight"]>0.50:
-                         c["confidence"]="Medium"
-                    elif c["weight"]>0.05:
-                         c["confidence"]="Low"
-                    else: 
-                         c["confidence"]="None"
-
-                coordinates.extend(current_coords)
+                coords_by_concept[concept_name] = current_region["coordinates"]
                 top_studies.extend(current_region["top_studies"])
+
+            # Stage 2: filter out weak evidence (below threshold) per concept
+            filtered_by_concept = {}
+            for concept_name, coords in coords_by_concept.items():
+                filtered_by_concept[concept_name] = [c for c in coords if c["weight"] >= CONFIDENCE_THRESHOLD]
+
+            # Stage 3: guarantee each concept its single strongest point, if it has any
+            selected = []
+            selected_keys = set()
+            for concept_name in concept_list:
+                candidates = filtered_by_concept.get(concept_name, [])
+                if candidates:
+                    best = max(candidates, key=lambda c: c["weight"])
+                    best["concept"] = concept_name
+                    selected.append(best)
+                    selected_keys.add((best["study_name"], best["x"], best["y"], best["z"]))
+
+            # Stage 4: fill remaining slots with the next-highest weights overall
+            remaining_pool = []
+            for concept_name, coords in filtered_by_concept.items():
+                for c in coords:
+                    key = (c["study_name"], c["x"], c["y"], c["z"])
+                    if key not in selected_keys:
+                        c["concept"] = concept_name
+                        remaining_pool.append(c)
+            remaining_pool.sort(key=lambda c: c["weight"], reverse=True)
+
+            for c in remaining_pool:
+                if len(selected) >= MAX_TOTAL_POINTS:
+                    break
+                key = (c["study_name"], c["x"], c["y"], c["z"])
+                if key not in selected_keys:
+                    selected.append(c)
+                    selected_keys.add(key)
+
+            # Stage 5: order by concept, assign global point numbers and evidence_strength labels
+            selected.sort(key=lambda c: concept_list.index(c["concept"]))
+            for i, c in enumerate(selected):
+                c["point_number"] = i + 1
+                if c["weight"] > 0.75:
+                    c["evidence_strength"] = "High"
+                elif c["weight"] > 0.50:
+                    c["evidence_strength"] = "Medium"
+                else:
+                    c["evidence_strength"] = "Low"
+
+            coordinates = selected
 
     if reply_text==None:
             reply_text=""
@@ -112,7 +153,7 @@ def chat(request: ChatRequest):
         for concept in concept_list:
             second_message_history+=(f'The concepts are {concept}')
         for coordinate in coordinates:
-            second_message_history+=(f'The coordinate point number is {coordinate["point_number"]} with coordinates {coordinate["x"]} {coordinate["y"]} {coordinate["z"]} and confidence is {coordinate["confidence"]} related to the study {coordinate["study_name"]} by {coordinate["study_author"]}')
+            second_message_history+=(f'The coordinate point number is {coordinate["point_number"]} with coordinates {coordinate["x"]} {coordinate["y"]} {coordinate["z"]} and confidence is {coordinate["evidence_strength"]} related to the study {coordinate["study_name"]} by {coordinate["study_author"]}')
 
         second_conversation = [{"role":"user", "content":second_message_history}]
 
