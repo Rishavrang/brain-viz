@@ -81,6 +81,7 @@ def chat(request: ChatRequest):
     reply_text = None
     concept_list = None
     top_studies =[]
+    coordinates = []
     CONFIDENCE_THRESHOLD = 0.30
     MAX_TOTAL_POINTS = 10
 
