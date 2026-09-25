@@ -79,6 +79,7 @@ def chat(request: ChatRequest):
         tools = [concept_extraction_tool]
     )
     reply_text = None
+    reply2_text = None
     concept_list = None
     top_studies =[]
     coordinates = []
@@ -149,7 +150,7 @@ def chat(request: ChatRequest):
     if reply_text==None:
             reply_text=""
 
-    if concept_list != None:
+    if concept_list:
         second_message_history=""
         for concept in concept_list:
             second_message_history+=(f'The concepts are {concept}')
@@ -168,6 +169,8 @@ def chat(request: ChatRequest):
         for block in response.content:
                 if block.type == "text":
                    reply2_text = block.text
+        if reply2_text is None:
+            reply2_text = ""
         if reply_text != "":
              reply_text += " " + reply2_text
         else:
