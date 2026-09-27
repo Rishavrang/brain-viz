@@ -1,6 +1,16 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Text, Float
+from sqlalchemy import Column, Integer, String, ForeignKey, Text, Float, UniqueConstraint
 from sqlalchemy.sql import func
 from database import Base
+
+class RateLimit(Base):
+    __tablename__ = "ratelimit"
+
+    id = Column(Integer, primary_key=True)
+    ip = Column(Text)
+    date = Column(Text)
+    count = Column(Integer)
+
+    __table_args__ = (UniqueConstraint('ip', 'date', name='unique_ip_date'),)
 
 class Studies(Base):
     __tablename__ = "studies"

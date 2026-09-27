@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -6,9 +6,10 @@ from dotenv import load_dotenv
 from anthropic import Anthropic
 from database import SessionLocal, engine, Base
 from models import User, Conversation, Message
-from neuro_models import Studies, Coordinate, Concept, Study_concept
+from neuro_models import Studies, Coordinate, Concept, Study_concept, RateLimit
 from neuro_queries import get_regions_for_concept
 from prompt import explanation_system_prompt, extraction_system_prompt
+from datetime import datetime, date
 import os
 
 load_dotenv()
@@ -57,8 +58,21 @@ def conv_start():
 
 
 @app.post("/chat")
-def chat(request: ChatRequest):
+def chat(request: ChatRequest, http_request: Request):
     db = SessionLocal()
+    client_ip = http_request.client.host
+    today = str(date.today())
+    row = db.query(RateLimit).filter(RateLimit.ip==client_ip, RateLimit.date==today).first()
+    if row is None:
+        user_limit = RateLimit(ip = client_ip, date = today, count = 1)
+        db.add(user_limit)
+        db.commit()
+    elif row.count < 10:
+        row.count += 1
+        db.commit()
+    else:
+        raise HTTPException(status_code=429, detail="Prompt limit has been hit.")
+
     conversation = db.query(Conversation).filter(Conversation.id == request.conversation_id).first()
     if conversation is None:
         raise HTTPException(status_code=404, detail="Conversation not found")
