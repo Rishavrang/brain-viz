@@ -85,6 +85,8 @@ def chat(request: ChatRequest):
     coordinates = []
     CONFIDENCE_THRESHOLD = 0.30
     MAX_TOTAL_POINTS = 10
+    coordinate_part = None
+    narrative_part = None
 
     for block in response.content:
         if block.type == "text":
@@ -169,6 +171,8 @@ def chat(request: ChatRequest):
         for block in response.content:
                 if block.type == "text":
                    reply2_text = block.text
+                   narrative_part, coordinate_part = reply2_text.split("## Coordinate Summary")
+                   coordinate_part = '## Coordinate Summary' + coordinate_part
         if reply2_text is None:
             reply2_text = ""
         if reply_text != "":
@@ -179,11 +183,14 @@ def chat(request: ChatRequest):
     if reply_text=="":
             reply_text="Second reply did not trigger.."
 
+    if narrative_part == None:
+        narrative_part = reply_text
+
     assistant_message =  Message(conversation_id=request.conversation_id, role = "assistant", content = reply_text)
     db.add(assistant_message)
     db.commit()
     
-    return {"reply": reply_text, "coordinates": coordinates, "detected_concepts":concept_list}
+    return {"reply": reply_text, "coordinates": coordinates, "detected_concepts":concept_list, "narrative_part":narrative_part, "coordinate_part":coordinate_part}
 
 
 @app.post("/new-conversation")
