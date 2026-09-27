@@ -8,7 +8,7 @@ from database import SessionLocal, engine, Base
 from models import User, Conversation, Message
 from neuro_models import Studies, Coordinate, Concept, Study_concept
 from neuro_queries import get_regions_for_concept
-from prompt import explanation_system_prompt
+from prompt import explanation_system_prompt, extraction_system_prompt
 import os
 
 load_dotenv()
@@ -75,7 +75,7 @@ def chat(request: ChatRequest):
         model="claude-sonnet-5",
         max_tokens=1000,
         messages = messages_history,
-        system="You are a helpful assistant. When extracting concepts, prefer simple, standard, single-word or short well-established neuroscience/psychology terms over descriptive phrases, since they must match a fixed scientific vocabulary.",
+        system = extraction_system_prompt,
         tools = [concept_extraction_tool]
     )
     reply_text = None
