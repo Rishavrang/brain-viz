@@ -2,3 +2,4 @@
 __pycache__/
 neurosynth_data/
 *.pyc
+evaluation_results.csv
