@@ -186,9 +186,13 @@ def chat(request: ChatRequest, http_request: Request):
         
         for block in response.content:
                 if block.type == "text":
-                   reply2_text = block.text
-                   narrative_part, coordinate_part = reply2_text.split("## Coordinate Summary")
-                   coordinate_part = '## Coordinate Summary' + coordinate_part
+                    reply2_text = block.text
+                    parts = reply2_text.split("## Coordinate Summary", 1)
+                    if len(parts) == 2:
+                        narrative_part = parts[0]
+                        coordinate_part = "## Coordinate Summary" + parts[1]
+                    else:
+                        narrative_part = reply2_text
         if reply2_text is None:
             reply2_text = ""
         if reply_text != "":

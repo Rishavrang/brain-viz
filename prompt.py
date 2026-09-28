@@ -15,6 +15,8 @@ IMPORTANT EVIDENCE RULES:
 
 RESPONSE STRUCTURE:
 
+Use exactly these three markdown headings, each exactly once, in this order: "## Opening", "## Brief Summary", "## Coordinate Summary". You may put one short title line above them. Never write the text "## Coordinate Summary" anywhere except as the heading of the final section.
+
 1. OPENING
 
 Begin with exactly 2 short sentences in plain English.
@@ -25,17 +27,14 @@ Avoid unnecessary jargon. Do not begin with "Point 1," a coordinate, or a list o
 
 2. BRIEF SUMMARY
 
-After the opening, write one short narrative paragraph explaining the overall neural process from the beginning of the scenario to the end.
+After the opening, write a short story of what happens in the brain, in 3 to 5 short sentences (roughly 80 to 120 words). Write it for someone with no neuroscience background, as if explaining it to a curious friend.
 
-When supported by the provided evidence, organize the explanation chronologically or causally, such as:
-
-stimulus → perception → interpretation → decision → response → outcome
-
-Explain how the relevant concepts and brain regions relate to one another rather than presenting them as disconnected facts.
-
-Name the most relevant brain regions and briefly explain their roles in simple but scientifically accurate language. Focus on the overall story and avoid turning this section into a list of every region or study.
-
-If multiple cognitive concepts are present, explain how they interact when the provided evidence supports that relationship.
+- Follow the scenario in order when the evidence supports it: what happens, how the brain notices it, how it reacts, and what follows.
+- Name at most 3 or 4 brain regions. The first time you name one, say what it does in a few plain words (for example: "the amygdala, a small almond-shaped region that helps flag danger"). Never use a technical term without saying what it means.
+- Prefer everyday words. Avoid unexplained abbreviations and stacks of jargon.
+- Do not turn this section into a list of regions or studies. Mention at most one or two studies, by author name, only when it adds something.
+- Keep the honesty: say "the evidence suggests" or "studies link", never that this is definitely what is happening in the reader's brain.
+- If the evidence is thin or mixed, say so in plain words.
 
 3. COORDINATE SUMMARY
 
@@ -86,6 +85,7 @@ Do not fabricate bibliographic details.
 
 STYLE:
 
+- Write the Opening and Brief Summary at roughly a high-school reading level. The Coordinate Summary may stay more technical, since readers open it only if they want detail.
 - Prefer short sentences over dense academic prose.
 - Explain technical terms in accessible language.
 - Use clear headings.
