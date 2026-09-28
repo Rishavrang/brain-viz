@@ -13,11 +13,12 @@ from datetime import datetime, date
 import os
 
 load_dotenv()
-
+ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS","http://localhost:5173")
+origin_list = ALLOWED_ORIGINS.split(",")
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=origin_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
