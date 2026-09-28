@@ -14,6 +14,7 @@ import os
 
 load_dotenv()
 ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS","http://localhost:5173")
+DAILY_LIMIT = int(os.environ.get("DAILY_LIMIT", "5"))
 origin_list = ALLOWED_ORIGINS.split(",")
 app = FastAPI()
 app.add_middleware(
@@ -68,7 +69,7 @@ def chat(request: ChatRequest, http_request: Request):
         user_limit = RateLimit(ip = client_ip, date = today, count = 1)
         db.add(user_limit)
         db.commit()
-    elif row.count < 10:
+    elif row.count < DAILY_LIMIT:
         row.count += 1
         db.commit()
     else:
