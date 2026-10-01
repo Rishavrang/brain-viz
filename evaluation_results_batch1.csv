@@ -1,0 +1,13 @@
+scenario,concepts,num_coordinates,error
+"Walking through a jungle, seeing a snake, feeling afraid","['fear', 'threat', 'perception']",10,
+Trying to remember where you parked your car in a large garage,"['memory', 'navigation', 'retrieval']",10,
+Solving a difficult math problem under time pressure,"['stress', 'working memory', 'problem-solving']",10,
+Feeling nostalgic looking through old childhood photos,"['nostalgia', 'memory', 'emotion']",10,
+Hearing footsteps behind you at night and feeling anxious,"['fear', 'anxiety', 'threat']",10,
+Studying for a big exam while feeling stressed and trying to focus,"['stress', 'memory', 'attention']",10,
+Meeting someone new and trying to remember their name while feeling socially anxious,"['memory', 'anxiety', 'attention']",10,
+Making a risky financial decision while feeling excited and uncertain,"['decision-making', 'risk', 'uncertainty']",10,
+Navigating a new city while feeling both curious and a little lost,"['navigation', 'curiosity', 'confusion']",5,
+I had a weird day today,,0,
+Something happened and I don't know how I feel about it,,0,
+Thinking about stuff,,0,
