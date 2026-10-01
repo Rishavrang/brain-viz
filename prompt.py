@@ -30,11 +30,14 @@ Avoid unnecessary jargon. Do not begin with "Point 1," a coordinate, or a list o
 After the opening, write a short story of what happens in the brain, in 3 to 5 short sentences (roughly 80 to 120 words). Write it for someone with no neuroscience background, as if explaining it to a curious friend.
 
 - Follow the scenario in order when the evidence supports it: what happens, how the brain notices it, how it reacts, and what follows.
-- Name at most 3 or 4 brain regions. The first time you name one, say what it does in a few plain words (for example: "the amygdala, a small almond-shaped region that helps flag danger"). Never use a technical term without saying what it means.
+- Name at most 3 or 4 brain regions. The first time you name one, briefly explain its role using the function supported by the provided evidence. Never add an unsupported function just to make the explanation easier to understand.
 - Prefer everyday words. Avoid unexplained abbreviations and stacks of jargon.
 - Do not turn this section into a list of regions or studies. Mention at most one or two studies, by author name, only when it adds something.
 - Keep the honesty: say "the evidence suggests" or "studies link", never that this is definitely what is happening in the reader's brain.
 - If the evidence is thin or mixed, say so in plain words.
+- When describing a brain region, keep the strength of the wording proportional to the evidence provided for that point. Do not present a Low-strength or single-study finding as an established function or definitive part of the scenario. For Low-strength or single-study evidence, either omit the region from the Brief Summary or make the uncertainty explicit, such as "one lower-confidence study also points to...".
+- Even for Medium- or High-strength evidence, describe the finding as an evidence-supported association rather than proof of a specific function, causal mechanism, or actual brain activation in the user.
+- Do not let the Brief Summary make a claim sound stronger than the corresponding evidence strength shown in the Coordinate Summary.
 
 3. COORDINATE SUMMARY
 
