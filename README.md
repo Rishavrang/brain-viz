@@ -85,8 +85,11 @@ These are real, considered extensions, deliberately scoped out of the initial bu
 
 ---
 
-## Credits
+## Credits & Acknowledgments
 
 - Brain model: NIH 3D (3DPX-020960), built from the Allen Human Reference Atlas, licensed CC BY 4.0
 - Neuroimaging data: [Neurosynth](https://neurosynth.org)
 - Built with Claude (Anthropic)
+- Inspiration: this project was shaped in part by [Avi Agola](https://linkedin.com/in/avi-agola)'s [$100 grant post](https://aviagola.me/grants) on building lightweight tools for tracking and predicting brain/behavioral response, in the spirit of Meta's TRIBE v2 — which also directly informed this project's visual and interaction design goals.
+
+Built by Rishav Rangapure.
