@@ -3,6 +3,7 @@
 Describe a scenario in plain English, and watch the brain regions it's associated with light up on an interactive 3D brain — grounded in real, cited neuroscience research, not guesswork.
 
 **Live demo:** https://brain-viz-frontend.vercel.app/
+**Demo Video** https://youtu.be/IImucbr5_Lw
 *(Free-tier hosting: the backend sleeps after ~15 minutes idle, so the first request after a quiet stretch can take 30-60 seconds. The database pauses after a week of total inactivity and is restored from the host dashboard — if the link seems broken, this is almost certainly why.)*
 
 ---
